@@ -3,86 +3,75 @@
 const openModal = () => document.getElementById('modal')
     .classList.add('active')
 
-const closeModal = () => {document.getElementById('modal')
-    .classList.remove('active')
+const closeModal = () => {
     clearFields()
+    document.getElementById('modal').classList.remove('active')
 }
 
-const tempCliente = {
-    nome: "Jorge",
-    email: 'jorgin@yahoo.com.br',
-    celular: '34536221',
-    cidade: 'colegio'
-
-}
 
 const getLocalStorage = () => JSON.parse(localStorage.getItem('db_client')) ?? []
-const setLocalStorage = (db_client) => localStorage.setItem('db_client', JSON.stringify(db_client))
+const setLocalStorage = (dbClient) => localStorage.setItem("db_client", JSON.stringify(dbClient))
 
-// Início do CRUD 
-
-// Create
+//  Inicio - CRUD
 
 const createCliente = (client) => {
-    const db_client = getLocalStorage()
-    db_client.push (client)
-    setLocalStorage(db_client)
-
+    const dbClient = getLocalStorage()
+    dbClient.push (client)
+    setLocalStorage(dbClient)
 }
 
-// Read
+
+const deleteClient = (index) => {
+    const dbClient = readCliente()
+    dbClient.splice(index, 1)
+    setLocalStorage(dbClient)
+}
+
+const updateCliente = (index, client) => {
+    const dbClient = readCliente()
+    dbClient[index] = client
+    setLocalStorage(dbClient)
+}
 
 const readCliente = () => getLocalStorage()
 
-// Update
-
-const updateCliente = (index, client) => {
-    const db_cliente = readCliente()
-    db_cliente[index] = client
-    setLocalStorage(db_cliente)
-
-}
-
-// Delete
-
-const deleteCliente = (index) => {
-    db_cliente = readCliente()
-    db_client.slice(index,1)
-    setLocalStorage(db_client)
-}
-
-
-
-// Interação cm o layout
 
 
 const isValidFields = () => {
     return document.getElementById('form').reportValidity()
-
 }
 
-const clearFields = () =>{
+//Interação com o layout
+
+const clearFields = () => {
     const fields = document.querySelectorAll('.modal-field')
-    fields.forEach(field => field.value = '');
-
+    fields.forEach(field => field.value = "")
+    document.getElementById('nome').dataset.index = 'new'
 }
-
 
 const saveClient = () => {
-    if (isValidFields()){
+    debugger
+    if (isValidFields()) {
         const client = {
             nome: document.getElementById('nome').value,
             email: document.getElementById('email').value,
             celular: document.getElementById('celular').value,
             cidade: document.getElementById('cidade').value
         }
-        createCliente(client)
-        closeModal()
-
+        const index = document.getElementById('nome').dataset.index
+        if (index == 'new') {
+            createCliente(client)
+            updateTable()
+            closeModal()
+        } else {
+            updateCliente(index, client)
+            updateTable()
+            closeModal()
+        }
     }
 }
 
-const createRow = (client, index) =>{
+const createRow = (client, index) => {
     const newRow = document.createElement('tr')
     newRow.innerHTML = `
         <td>${client.nome}</td>
@@ -90,28 +79,60 @@ const createRow = (client, index) =>{
         <td>${client.celular}</td>
         <td>${client.cidade}</td>
         <td>
-            <button type="button" class="button green">EDITAR</button>
-            <button type="button" class="button red">EXCLUIR</button>
+            <button type="button" class="button green" id="edit-${index}">Editar</button>
+            <button type="button" class="button red" id="delete-${index}" >Excluir</button>
         </td>
     `
     document.querySelector('#tableClient>tbody').appendChild(newRow)
 }
 
-const clearTable = () =>{
+const clearTable = () => {
     const rows = document.querySelectorAll('#tableClient>tbody tr')
     rows.forEach(row => row.parentNode.removeChild(row))
 }
 
-const updateTable = () =>{
-    const db_client = readCliente()
+const updateTable = () => {
+    const dbClient = readCliente()
     clearTable()
-    db_client.forEach(createRow)
+    dbClient.forEach(createRow)
 }
 
+const fillFields = (client) => {
+    document.getElementById('nome').value = client.nome
+    document.getElementById('email').value = client.email
+    document.getElementById('celular').value = client.celular
+    document.getElementById('cidade').value = client.cidade
+    document.getElementById('nome').dataset.index = client.index
+}
+
+const editClient = (index) => {
+    const client = readCliente()[index]
+    client.index = index
+    fillFields(client)
+    openModal()
+}
+
+const editDelete = (event) => {
+    if (event.target.type == 'button') {
+
+        const [action, index] = event.target.id.split('-')
+
+        if (action == 'edit') {
+            editClient(index)
+        } else {
+            const client = readCliente()[index]
+            const response = confirm(`Deseja realmente excluir o cliente ${client.nome}`)
+            if (response) {
+                deleteClient(index)
+                updateTable()
+            }
+        }
+    }
+}
 
 updateTable()
 
-//Eventos
+// Eventos
 document.getElementById('cadastrarCliente')
     .addEventListener('click', openModal)
 
@@ -120,3 +141,9 @@ document.getElementById('modalClose')
 
 document.getElementById('salvar')
     .addEventListener('click', saveClient)
+
+document.querySelector('#tableClient>tbody')
+    .addEventListener('click', editDelete)
+
+document.getElementById('cancelar')
+    .addEventListener('click', closeModal)
