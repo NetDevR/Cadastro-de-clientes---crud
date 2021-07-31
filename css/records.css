@@ -26,6 +26,10 @@
     background-color: var(--secundary-color);
 }
 
+.table-titles{
+    color: white;
+}
+
 @media(max-width:480px){
     .records{
         border-spacing: 5px;
