@@ -14,18 +14,19 @@ const setLocalStorage = (dbClient) => localStorage.setItem("db_client", JSON.str
 
 //  Inicio - CRUD
 
+// Create
+
 const createCliente = (client) => {
     const dbClient = getLocalStorage()
     dbClient.push (client)
     setLocalStorage(dbClient)
 }
 
+// Read
 
-const deleteClient = (index) => {
-    const dbClient = readCliente()
-    dbClient.splice(index, 1)
-    setLocalStorage(dbClient)
-}
+const readCliente = () => getLocalStorage()
+
+// Update
 
 const updateCliente = (index, client) => {
     const dbClient = readCliente()
@@ -33,9 +34,13 @@ const updateCliente = (index, client) => {
     setLocalStorage(dbClient)
 }
 
-const readCliente = () => getLocalStorage()
+//Remove
 
-
+const deleteClient = (index) => {
+    const dbClient = readCliente()
+    dbClient.splice(index, 1)
+    setLocalStorage(dbClient)
+}
 
 const isValidFields = () => {
     return document.getElementById('form').reportValidity()
@@ -50,7 +55,6 @@ const clearFields = () => {
 }
 
 const saveClient = () => {
-    debugger
     if (isValidFields()) {
         const client = {
             nome: document.getElementById('nome').value,
