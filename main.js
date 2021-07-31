@@ -50,7 +50,15 @@ const deleteCliente = (index) => {
     setLocalStorage(db_client)
 }
 
+
+
 // Interação cm o layout
+
+const isValidFields = () => {
+    return document.getElementById('form').reportValidity()
+
+}
+
 
 const saveClient = () =>{
     if (isValidFields()){
