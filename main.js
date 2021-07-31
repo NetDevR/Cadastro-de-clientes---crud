@@ -3,9 +3,10 @@
 const openModal = () => document.getElementById('modal')
     .classList.add('active')
 
-const closeModal = () => document.getElementById('modal')
+const closeModal = () => {document.getElementById('modal')
     .classList.remove('active')
-
+    clearFields()
+}
 
 const tempCliente = {
     nome: "Jorge",
@@ -54,19 +55,61 @@ const deleteCliente = (index) => {
 
 // Interação cm o layout
 
+
 const isValidFields = () => {
     return document.getElementById('form').reportValidity()
+
+}
+
+const clearFields = () =>{
+    const fields = document.querySelectorAll('.modal-field')
+    fields.forEach(field => field.value = '');
 
 }
 
 
 const saveClient = () => {
     if (isValidFields()){
-        console.log('Cadastrando cliente')
+        const client = {
+            nome: document.getElementById('nome').value,
+            email: document.getElementById('email').value,
+            celular: document.getElementById('celular').value,
+            cidade: document.getElementById('cidade').value
+        }
+        createCliente(client)
+        closeModal()
 
     }
 }
 
+const createRow = (client, index) =>{
+    const newRow = document.createElement('tr')
+    newRow.innerHTML = `
+        <td>${client.nome}</td>
+        <td>${client.email}</td>
+        <td>${client.celular}</td>
+        <td>${client.cidade}</td>
+        <td>
+            <button type="button" class="button green">EDITAR</button>
+            <button type="button" class="button red">EXCLUIR</button>
+        </td>
+    `
+    document.querySelector('#tableClient>tbody').appendChild(newRow)
+}
+
+const clearTable = () =>{
+    const rows = document.querySelectorAll('#tableClient>tbody tr')
+    rows.forEach(row => row.parentNode.removeChild(row))
+}
+
+const updateTable = () =>{
+    const db_client = readCliente()
+    clearTable()
+    db_client.forEach(createRow)
+}
+
+
+updateTable()
 
 //Eventos
 document.getElementById('cadastrarCliente')
