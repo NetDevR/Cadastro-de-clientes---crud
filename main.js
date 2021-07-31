@@ -60,15 +60,12 @@ const isValidFields = () => {
 }
 
 
-const saveClient = () =>{
+const saveClient = () => {
     if (isValidFields()){
         console.log('Cadastrando cliente')
 
     }
 }
-
-
-
 
 
 //Eventos
